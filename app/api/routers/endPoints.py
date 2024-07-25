@@ -19,12 +19,45 @@ def getDb():
         db.close()
 
 #ENDPOINTS PARA EL API
-def crearDragon():
-    pass
-def buscarDragones():
-    pass
-def buscarDragonPorId():
-    pass
+@rutas.post("/dragones",response_model=DragonDTORespuesta,summary="Crea un Dragon en la BD",description="Crear Dragon",tags=["Dragones"])
+
+def crearDragon(datosCliente:DragonDTOPeticion,db:Session=Depends(getDb())):
+    try:
+        dragon = Dragon(
+            nombres=datosCliente.nombres,
+            edad=datosCliente.edad,
+            altura=datosCliente.altura,
+            numeroVictorias=datosCliente.numeroVictorias
+        )
+        db.add(dragon) #orden en bd
+        db.commit() #valido la operacion que acabo de realizar
+        db.refresh(dragon) #actualizo la variable dragon con los datos de la bd
+        return dragon
+        
+    except Exception as error:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Tenemos un problema en el servidor: {error}")
+    
+
+@rutas.get("/dragones", response_model=List[DragonDTORespuesta], summary="Servicio que lista todos los Dragones en la BD")
+def buscarDragones(db:Session=Depends(getDb())):
+    try:
+        dragones = db.query(Dragon).all()
+        return dragones
+    except Exception as error:
+        raise HTTPException(status_code=500, detail=f"Tenemos un problema en el servidor: {error}")
+
+
+@rutas.get("/dragones/{id}", response_model=DragonDTORespuesta, summary="Servicio que busca un Dragon por su ID en la BD")
+def buscarDragonPorId(id:int,db:Session=Depends(getDb())):
+    try:
+        dragon = db.query(Dragon).get(id)
+        return dragon
+    
+    except Exception as error:
+        raise HTTPException(status_code=500, detail=f"Tenemos un problema en el servidor: {error}")
+
+    
 def modificarDragonPorId():
     pass
 def eliminarDragonPorId():
