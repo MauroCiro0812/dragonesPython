@@ -21,7 +21,7 @@ def getDb():
 #ENDPOINTS PARA EL API
 @rutas.post("/dragones",response_model=DragonDTORespuesta,summary="Crea un Dragon en la BD",description="Crear Dragon",tags=["Dragones"])
 
-def crearDragon(datosCliente:DragonDTOPeticion,db:Session=Depends(getDb())):
+def crearDragon(datosCliente:DragonDTOPeticion,db:Session=Depends(getDb)):
     try:
         dragon = Dragon(
             nombres=datosCliente.nombres,
@@ -40,7 +40,7 @@ def crearDragon(datosCliente:DragonDTOPeticion,db:Session=Depends(getDb())):
     
 
 @rutas.get("/dragones", response_model=List[DragonDTORespuesta], summary="Servicio que lista todos los Dragones en la BD")
-def buscarDragones(db:Session=Depends(getDb())):
+def buscarDragones(db:Session=Depends(getDb)):
     try:
         dragones = db.query(Dragon).all()
         return dragones
@@ -49,7 +49,7 @@ def buscarDragones(db:Session=Depends(getDb())):
 
 
 @rutas.get("/dragones/{id}", response_model=DragonDTORespuesta, summary="Servicio que busca un Dragon por su ID en la BD")
-def buscarDragonPorId(id:int,db:Session=Depends(getDb())):
+def buscarDragonPorId(id:int,db:Session=Depends(getDb)):
     try:
         dragon = db.query(Dragon).get(id)
         return dragon
